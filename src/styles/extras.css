@@ -1,0 +1,20 @@
+/* ═════════ EXTRAS (new sections get appended here) ═════════ */
+
+/* ── scratch cards ── */
+.sec--scratch { text-align: center; background: radial-gradient(ellipse at 50% 40%, rgba(244, 191, 210, 0.09), transparent 60%), var(--bg); }
+.scratch__hint { margin-top: 1rem; color: var(--gold); font-family: var(--font-hand); font-size: clamp(1.4rem, 3vw, 1.9rem); }
+.scratch__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: clamp(1rem, 2.4vw, 1.8rem); max-width: 1000px; margin: 0 auto; }
+.scratch { margin: 0; display: grid; gap: 0.9rem; justify-items: center; }
+.scratch__box { position: relative; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 18px; background: var(--bg-2); box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--line); }
+.scratch__box img { width: 100%; height: 100%; object-fit: cover; }
+.scratch__text { position: absolute; left: 0; right: 0; bottom: 0; padding: 3.2rem 1.1rem 1.1rem; text-align: left; font-family: var(--font-serif); font-style: italic; font-size: clamp(1.05rem, 2vw, 1.3rem); line-height: 1.4;
+  background: linear-gradient(transparent, rgba(8, 9, 11, 0.85)); }
+.scratch__foil { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: none; transition: opacity 0.9s var(--ease); }
+.scratch.is-done .scratch__foil { opacity: 0; pointer-events: none; }
+.scratch__skip { font-size: 0.85rem; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; transition: color 0.3s; }
+.scratch__skip:hover { color: #fff; }
+@media (max-width: 767px) {
+  /* leave empty side margins so the page can still be scrolled with a thumb */
+  .scratch { width: min(78vw, 330px); margin-inline: auto; }
+  .scratch__grid { grid-template-columns: 1fr; justify-items: center; }
+}

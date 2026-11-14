@@ -10,6 +10,7 @@ import './styles/birthday.css';
 import './styles/polish.css';
 import './styles/vault.css';
 import './styles/premium.css';
+import './styles/extras.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

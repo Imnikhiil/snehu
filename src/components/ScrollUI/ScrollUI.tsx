@@ -1,27 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUp } from 'lucide-react';
 
-const SECTIONS = [
-  { id: 'home', label: 'Home' },
-  { id: 'intro', label: 'Welcome' },
-  { id: 'memories', label: 'Memories' },
-  { id: 'videos', label: 'Videos' },
-  { id: 'timeline', label: 'Timeline' },
-  { id: 'appreciation', label: 'Celebrating You' },
-  { id: 'letter', label: 'A Little Note' },
-  { id: 'vault', label: 'Secret' },
-  { id: 'cake', label: 'Make A Wish' },
-  { id: 'gift', label: 'Surprise' },
-  { id: 'collage', label: 'Collage' },
-  { id: 'celebrate', label: 'Celebrate' },
-];
+// nice names for the side dots; any other section on the page gets a dot automatically
+const LABELS: Record<string, string> = {
+  home: 'Home', intro: 'Welcome', countdown: 'Countdown', memories: 'Memories', videos: 'Videos', timeline: 'Timeline',
+  appreciation: 'Celebrating You', scratch: 'Scratch Cards', letter: 'A Little Note', vault: 'Secret', cake: 'Make A Wish',
+  wish: 'Wish Sky', collage: 'Collage', celebrate: 'Celebrate',
+};
+const nice = (id: string) => LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1);
 
 /** Scroll progress bar, section dots (desktop) and back-to-top button. */
 export default function ScrollUI() {
   const bar = useRef<HTMLDivElement>(null);
   const [showTop, setShowTop] = useState(false);
   const [active, setActive] = useState('home');
-  const [sections, setSections] = useState(SECTIONS);
+  const [sections, setSections] = useState<{ id: string; label: string }[]>([]);
 
   useEffect(() => {
     let raf = 0;
@@ -46,9 +39,8 @@ export default function ScrollUI() {
   }, []);
 
   useEffect(() => {
-    const present = SECTIONS.filter((s) => document.getElementById(s.id));
-    setSections(present);
-    const els = present.map((s) => document.getElementById(s.id)) as HTMLElement[];
+    const els = Array.from(document.querySelectorAll<HTMLElement>('main > section[id]'));
+    setSections(els.map((el) => ({ id: el.id, label: nice(el.id) })));
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
       { rootMargin: '-45% 0px -45% 0px' },

@@ -8,6 +8,7 @@ import MemoryGallery from './components/MemoryGallery/MemoryGallery';
 import VideoMemories from './components/VideoMemories/VideoMemories';
 import MemoryTimeline from './components/MemoryTimeline/MemoryTimeline';
 import AppreciationCards from './components/AppreciationCards/AppreciationCards';
+import ScratchCards from './components/ScratchCards/ScratchCards';
 import Marquee from './components/Marquee/Marquee';
 import BirthdayLetter from './components/BirthdayLetter/BirthdayLetter';
 import SecretVault from './components/SecretVault/SecretVault';
@@ -51,6 +52,7 @@ export default function App() {
         <VideoMemories />
         <MemoryTimeline />
         <AppreciationCards />
+        <ScratchCards />
         <Marquee items={['Happy Birthday Sneha', '17 · 11 · 2026', 'Make a wish', 'Keep shining', 'Smile more', 'Beautiful moments']} />
         <BirthdayLetter />
         <SecretVault />
