@@ -11,6 +11,7 @@ import AppreciationCards from './components/AppreciationCards/AppreciationCards'
 import ScratchCards from './components/ScratchCards/ScratchCards';
 import Marquee from './components/Marquee/Marquee';
 import BirthdayLetter from './components/BirthdayLetter/BirthdayLetter';
+import OpenWhen from './components/OpenWhen/OpenWhen';
 import SecretVault from './components/SecretVault/SecretVault';
 import BirthdayCake from './components/BirthdayCake/BirthdayCake';
 import WishJar from './components/WishJar/WishJar';
@@ -55,6 +56,7 @@ export default function App() {
         <ScratchCards />
         <Marquee items={['Happy Birthday Sneha', '17 · 11 · 2026', 'Make a wish', 'Keep shining', 'Smile more', 'Beautiful moments']} />
         <BirthdayLetter />
+        <OpenWhen />
         <SecretVault />
         <BirthdayCake />
         <WishJar />

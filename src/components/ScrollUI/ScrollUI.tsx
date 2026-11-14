@@ -40,7 +40,7 @@ export default function ScrollUI() {
 
   useEffect(() => {
     const els = Array.from(document.querySelectorAll<HTMLElement>('main > section[id]'));
-    setSections(els.map((el) => ({ id: el.id, label: nice(el.id) })));
+    setSections(els.map((el) => ({ id: el.id, label: el.dataset.label ?? nice(el.id) })));
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
       { rootMargin: '-45% 0px -45% 0px' },
