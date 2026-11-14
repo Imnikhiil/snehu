@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import Lightbox from '../Lightbox/Lightbox';
+import { useInView } from '../../hooks/useInView';
 import { CATEGORIES, type Photo } from '../../data/photos';
 import { getGalleryPhotos } from '../../data/gallery';
 import { galleryCopy } from '../../data/sections';
@@ -18,10 +19,12 @@ interface TileProps {
 }
 
 function Tile({ photo, i, onOpen, className = '', polaroid }: TileProps) {
+  const [ref, inView] = useInView<HTMLButtonElement>(0.12);
   return (
     <button
-      className={`tile ${polaroid ? 'tile--polaroid' : ''} ${className}`}
-      style={{ ...cssVars({ '--r': `${ROT[i % ROT.length]}deg`, '--i': i }), aspectRatio: polaroid ? undefined : RATIO[photo.orientation] }}
+      ref={ref}
+      className={`tile ${polaroid ? 'tile--polaroid' : ''} ${inView ? 'is-in' : ''} ${className}`}
+      style={{ ...cssVars({ '--r': `${ROT[i % ROT.length]}deg`, '--i': i, '--j': i % 5 }), aspectRatio: polaroid ? undefined : RATIO[photo.orientation] }}
       onClick={onOpen}
       aria-label={photo.caption ? `Open photo: ${photo.caption}` : 'Open photo'}
     >

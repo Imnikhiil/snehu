@@ -24,13 +24,22 @@ export default function BirthdayLetter() {
         </header>
 
         <div className="ltr__stage">
-          <div className={`env ${stage >= 1 ? 'is-open' : ''} ${stage === 2 ? 'is-gone' : ''}`} aria-hidden={stage === 2}>
-            <div className="env__back" />
-            <div className="env__flap" />
-            <div className="env__paper" />
-            <div className="env__front" />
-            <div className="env__seal" aria-hidden="true">S</div>
-          </div>
+          {/* the envelope itself is the button: tap it to open */}
+          <button
+            type="button"
+            className={`env ${stage >= 1 ? 'is-open' : ''} ${stage === 2 ? 'is-gone' : ''}`}
+            onClick={open}
+            disabled={stage !== 0}
+            aria-label="Open your letter"
+            aria-hidden={stage === 2}
+            tabIndex={stage === 0 ? 0 : -1}
+          >
+            <span className="env__back" />
+            <span className="env__flap" />
+            <span className="env__paper" />
+            <span className="env__front" />
+            <span className="env__seal" aria-hidden="true">S</span>
+          </button>
 
           <article className={`ltr ${stage === 2 ? 'is-in' : ''}`} aria-hidden={stage !== 2} aria-label="A letter for Sneha">
             <p className="ltr__hi">{letter.salutation}</p>
@@ -39,18 +48,14 @@ export default function BirthdayLetter() {
                 {l.text}
               </p>
             ))}
-            <p className="ltr__line ltr__sign is-hand" style={cssVars({ '--delay': `${0.4 + n * 0.9}s` })}>
+            <p className="ltr__sign ltr__line is-hand" style={cssVars({ '--delay': `${0.4 + n * 0.9}s` })}>
               {letter.signoff}
             </p>
           </article>
         </div>
 
         <div className="ltr__cta">
-          {stage === 0 && (
-            <button className="btn btn--primary" onClick={open}>
-              {letter.open}
-            </button>
-          )}
+          {stage === 0 && <p className="ltr__tap">Tap the envelope</p>}
         </div>
       </div>
     </section>

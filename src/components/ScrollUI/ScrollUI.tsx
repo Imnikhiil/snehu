@@ -9,6 +9,7 @@ const SECTIONS = [
   { id: 'timeline', label: 'Timeline' },
   { id: 'appreciation', label: 'Celebrating You' },
   { id: 'letter', label: 'A Little Note' },
+  { id: 'vault', label: 'Secret' },
   { id: 'cake', label: 'Make A Wish' },
   { id: 'gift', label: 'Surprise' },
   { id: 'collage', label: 'Collage' },
@@ -20,6 +21,7 @@ export default function ScrollUI() {
   const bar = useRef<HTMLDivElement>(null);
   const [showTop, setShowTop] = useState(false);
   const [active, setActive] = useState('home');
+  const [sections, setSections] = useState(SECTIONS);
 
   useEffect(() => {
     let raf = 0;
@@ -44,10 +46,34 @@ export default function ScrollUI() {
   }, []);
 
   useEffect(() => {
-    const els = SECTIONS.map((s) => document.getElementById(s.id)).filter(Boolean) as HTMLElement[];
+    const present = SECTIONS.filter((s) => document.getElementById(s.id));
+    setSections(present);
+    const els = present.map((s) => document.getElementById(s.id)) as HTMLElement[];
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
       { rootMargin: '-45% 0px -45% 0px' },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  // headings, kickers and captions wipe/fade in as they scroll into view
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    const els = Array.from(document.querySelectorAll<HTMLElement>('.sec__head > *, .vid-kicker, .collage__sub, .gift__hint, .vault__hint'))
+      .filter((el) => !el.classList.contains('rv'));
+    els.forEach((el, i) => {
+      el.classList.add('rvx');
+      el.style.setProperty('--rd', `${(i % 3) * 90}ms`);
+    });
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-in');
+          io.unobserve(e.target);
+        }
+      }),
+      { threshold: 0.2 },
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -65,7 +91,7 @@ export default function ScrollUI() {
       </div>
 
       <nav className="dots" aria-label="Page sections">
-        {SECTIONS.map((s) => (
+        {sections.map((s) => (
           <button
             key={s.id}
             className={`dots__btn ${active === s.id ? 'is-active' : ''}`}

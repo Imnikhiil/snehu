@@ -61,5 +61,29 @@ export default function CursorGlow() {
     };
   }, []);
 
+  // tiny sparkle burst wherever you click / tap
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const colors = ['#C9B8FF', '#F4BFD2', '#D7BB83', '#FFFFFF'];
+    const onDown = (e: PointerEvent) => {
+      const n = 7;
+      for (let i = 0; i < n; i++) {
+        const el = document.createElement('span');
+        el.className = 'spark-click';
+        const a = (Math.PI * 2 * i) / n + Math.random() * 0.6;
+        const d = 26 + Math.random() * 28;
+        el.style.left = `${e.clientX}px`;
+        el.style.top = `${e.clientY}px`;
+        el.style.color = colors[i % colors.length];
+        el.style.setProperty('--dx', `${(Math.cos(a) * d).toFixed(1)}px`);
+        el.style.setProperty('--dy', `${(Math.sin(a) * d).toFixed(1)}px`);
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 800);
+      }
+    };
+    window.addEventListener('pointerdown', onDown, { passive: true });
+    return () => window.removeEventListener('pointerdown', onDown);
+  }, []);
+
   return <div ref={glow} className="cursor-glow" aria-hidden="true" />;
 }
