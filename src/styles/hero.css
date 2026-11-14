@@ -95,4 +95,4 @@
   .hero__badge { left: 50%; right: auto; translate: -50% 0; bottom: 1.6rem; white-space: nowrap; font-size: 0.64rem; }
   .hero__wire { width: 150vmax; height: 150vmax; top: 30%; }
   .hero__grid { background-size: 56px 56px; }
-}src/data/photos.ts
+}
