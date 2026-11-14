@@ -3,6 +3,7 @@ import LoadingScreen from './components/LoadingScreen/LoadingScreen';
 import Navbar from './components/Navbar/Navbar';
 import Hero from './components/Hero/Hero';
 import Introduction from './components/Introduction/Introduction';
+import StoryMode from './components/StoryMode/StoryMode';
 import Countdown from './components/Countdown/Countdown';
 import MemoryGallery from './components/MemoryGallery/MemoryGallery';
 import VideoMemories from './components/VideoMemories/VideoMemories';
@@ -49,6 +50,7 @@ export default function App() {
         <Hero ready={ready} photos={heroPhotos} onOpen={setLightbox} />
         <Introduction />
         <Countdown />
+        <StoryMode />
         <MemoryGallery />
         <VideoMemories />
         <MemoryTimeline />

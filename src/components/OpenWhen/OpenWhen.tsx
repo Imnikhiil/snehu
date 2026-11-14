@@ -1,109 +1,104 @@
 import { useEffect, useRef, useState } from 'react';
-import { Check, CloudRain, Moon, Smile, Sparkles, Trophy, X, type LucideIcon } from 'lucide-react';
-import Particles from '../Particles/Particles';
-import { openWhen as c, openWhenCards as cards, type IconKey } from '../../data/openwhen';
-import { useInView } from '../../hooks/useInView';
-import { burstAt } from '../../utils/confetti';
-import { cssVars } from '../../utils/cssVars';
+import { ArrowUp } from 'lucide-react';
 
-const ICONS: Record<IconKey, LucideIcon> = { smile: Smile, rain: CloudRain, trophy: Trophy, moon: Moon, sparkle: Sparkles };
+// nice names for the side dots; any other section on the page gets a dot automatically
+const LABELS: Record<string, string> = {
+  home: 'Home', intro: 'Welcome', countdown: 'Countdown', memories: 'Memories', videos: 'Videos', timeline: 'Timeline',
+  appreciation: 'Celebrating You', scratch: 'Scratch Cards', letter: 'A Little Note', vault: 'Secret', cake: 'Make A Wish',
+  wish: 'Wish Sky', collage: 'Collage', celebrate: 'Celebrate',
+};
+const nice = (id: string) => LABELS[id] ?? id.charAt(0).toUpperCase() + id.slice(1);
 
-export default function OpenWhen() {
-  const [gridRef, inView] = useInView<HTMLDivElement>(0.2);
-  const [opening, setOpening] = useState<number | null>(null); // envelope whose flap is opening
-  const [active, setActive] = useState<number | null>(null); // note being read
-  const [read, setRead] = useState<Set<number>>(new Set());
-  const closeBtn = useRef<HTMLButtonElement>(null);
-  const lastFocus = useRef<HTMLElement | null>(null);
-  const timer = useRef<number>();
-
-  useEffect(() => () => clearTimeout(timer.current), []);
-
-  const open = (i: number) => {
-    if (opening !== null) return;
-    lastFocus.current = document.activeElement as HTMLElement | null;
-    setOpening(i);
-    timer.current = window.setTimeout(() => {
-      setActive(i);
-      if (cards[i].confetti) void burstAt(null);
-    }, 650);
-  };
-
-  const close = () => {
-    if (active !== null) setRead((r) => new Set(r).add(active));
-    setActive(null);
-    setOpening(null);
-    lastFocus.current?.focus?.();
-  };
+/** Scroll progress bar, section dots (desktop) and back-to-top button. */
+export default function ScrollUI() {
+  const bar = useRef<HTMLDivElement>(null);
+  const [showTop, setShowTop] = useState(false);
+  const [active, setActive] = useState('home');
+  const [sections, setSections] = useState<{ id: string; label: string }[]>([]);
 
   useEffect(() => {
-    if (active === null) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-      else if (e.key === 'Tab') {
-        e.preventDefault(); // the close button is the only control in the note
-        closeBtn.current?.focus();
-      }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? window.scrollY / max : 0;
+      if (bar.current) bar.current.style.transform = `scaleX(${Math.min(1, p)})`;
+      setShowTop(window.scrollY > 800);
     };
-    window.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    closeBtn.current?.focus();
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
     return () => {
-      window.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      cancelAnimationFrame(raf);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active]);
+  }, []);
 
-  const card = active !== null ? cards[active] : null;
+  useEffect(() => {
+    const els = Array.from(document.querySelectorAll<HTMLElement>('main > section[id]'));
+    setSections(els.map((el) => ({ id: el.id, label: el.dataset.label ?? nice(el.id) })));
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => e.isIntersecting && setActive(e.target.id)),
+      { rootMargin: '-45% 0px -45% 0px' },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  // headings, kickers and captions wipe/fade in as they scroll into view
+  useEffect(() => {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) return;
+    const els = Array.from(document.querySelectorAll<HTMLElement>('.sec__head > *, .vid-kicker, .collage__sub, .gift__hint, .vault__hint'))
+      .filter((el) => !el.classList.contains('rv'));
+    els.forEach((el, i) => {
+      el.classList.add('rvx');
+      el.style.setProperty('--rd', `${(i % 3) * 90}ms`);
+    });
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-in');
+          io.unobserve(e.target);
+        }
+      }),
+      { threshold: 0.2 },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
+  const go = (id: string) => {
+    if (id === 'home') window.scrollTo({ top: 0, behavior: 'smooth' });
+    else document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <section id="openwhen" data-label="Open When" className="sec sec--ow">
-      <Particles count={12} />
-      <div className="sec__in">
-        <header className="sec__head">
-          <p className="sec__eyebrow">{c.eyebrow}</p>
-          <h2 className="sec__title">{c.title}</h2>
-          <p className="ow__hint">{c.hint}</p>
-        </header>
-
-        <div ref={gridRef} className={`ow__grid ${inView ? 'is-in' : ''}`}>
-          {cards.map((cd, i) => {
-            const Icon = ICONS[cd.icon];
-            return (
-              <button
-                key={i}
-                className={`ow ${opening === i ? 'is-open' : ''} ${read.has(i) ? 'is-read' : ''}`}
-                style={{ ...cssVars({ '--t1': cd.colors[0], '--t2': cd.colors[1], '--i': i }) }}
-                onClick={() => open(i)}
-                aria-haspopup="dialog"
-                aria-label={cd.title}
-              >
-                <span className="ow__back" />
-                <span className="ow__flap" />
-                <span className="ow__paper" />
-                <span className="ow__front" />
-                <span className="ow__seal" aria-hidden="true">{read.has(i) ? <Check size={16} /> : <Icon size={16} />}</span>
-                <span className="ow__label">{cd.title}</span>
-              </button>
-            );
-          })}
-        </div>
+    <>
+      <div className="progress" aria-hidden="true">
+        <div ref={bar} className="progress__bar" />
       </div>
 
-      {card && (
-        <div className="ow__modal" role="dialog" aria-modal="true" aria-label={card.title} onClick={close}>
-          <article className="ow__note" onClick={(e) => e.stopPropagation()}>
-            <button ref={closeBtn} className="ow__close" onClick={close} aria-label={c.close}><X size={18} /></button>
-            <p className="ow__ttl">{card.title}</p>
-            {card.photo && <img className="ow__photo" src={card.photo} alt="" loading="lazy" decoding="async" />}
-            <div className="ow__msg">
-              {card.message.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)}
-            </div>
-            <p className="ow__sign">{c.signoff}</p>
-          </article>
-        </div>
-      )}
-    </section>
+      <nav className="dots" aria-label="Page sections">
+        {sections.map((s) => (
+          <button
+            key={s.id}
+            className={`dots__btn ${active === s.id ? 'is-active' : ''}`}
+            onClick={() => go(s.id)}
+            aria-label={s.label}
+            aria-current={active === s.id ? 'true' : undefined}
+          >
+            <span className="dots__label">{s.label}</span>
+          </button>
+        ))}
+      </nav>
+
+      <button className={`totop ${showTop ? 'is-in' : ''}`} onClick={() => go('home')} aria-label="Back to top" tabIndex={showTop ? 0 : -1}>
+        <ArrowUp size={18} />
+      </button>
+    </>
   );
 }
