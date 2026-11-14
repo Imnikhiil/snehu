@@ -1,1 +1,17 @@
-{ "v": 1, "digits": 0, "iterations": 200000, "salt": "", "check": "", "message": null, "items": [] }
+{
+  "v": 1,
+  "digits": 4,
+  "iterations": 200000,
+  "salt": "ne/zA1j4UsbeyNSpaEWfBw==",
+  "check": "RnqMYjTdL2i9/ZEYsCP7OXl/UCUKj0uKo+ypceFCO9Tev6DEyE7GM78M",
+  "message": null,
+  "items": [
+    {
+      "type": "photo",
+      "file": "/vault/001.bin",
+      "mime": "image/webp",
+      "w": 1200,
+      "h": 1600
+    }
+  ]
+}

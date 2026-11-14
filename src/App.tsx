@@ -3,6 +3,7 @@ import LoadingScreen from './components/LoadingScreen/LoadingScreen';
 import Navbar from './components/Navbar/Navbar';
 import Hero from './components/Hero/Hero';
 import Introduction from './components/Introduction/Introduction';
+import Countdown from './components/Countdown/Countdown';
 import MemoryGallery from './components/MemoryGallery/MemoryGallery';
 import VideoMemories from './components/VideoMemories/VideoMemories';
 import MemoryTimeline from './components/MemoryTimeline/MemoryTimeline';
@@ -11,12 +12,13 @@ import Marquee from './components/Marquee/Marquee';
 import BirthdayLetter from './components/BirthdayLetter/BirthdayLetter';
 import SecretVault from './components/SecretVault/SecretVault';
 import BirthdayCake from './components/BirthdayCake/BirthdayCake';
-import SurpriseGift from './components/SurpriseGift/SurpriseGift';
+import WishJar from './components/WishJar/WishJar';
 import PhotoCollage from './components/PhotoCollage/PhotoCollage';
 import FinalCelebration from './components/FinalCelebration/FinalCelebration';
 import MusicPlayer from './components/MusicPlayer/MusicPlayer';
 import ScrollUI from './components/ScrollUI/ScrollUI';
 import CursorGlow from './components/CursorGlow/CursorGlow';
+import Petals from './components/Petals/Petals';
 import Lightbox from './components/Lightbox/Lightbox';
 import { getHeroPhotos } from './data/photos';
 
@@ -44,6 +46,7 @@ export default function App() {
       <main id="main" tabIndex={-1}>
         <Hero ready={ready} photos={heroPhotos} onOpen={setLightbox} />
         <Introduction />
+        <Countdown />
         <MemoryGallery />
         <VideoMemories />
         <MemoryTimeline />
@@ -52,11 +55,12 @@ export default function App() {
         <BirthdayLetter />
         <SecretVault />
         <BirthdayCake />
-        <SurpriseGift />
+        <WishJar />
         <PhotoCollage />
         <FinalCelebration />
       </main>
       <ScrollUI />
+      <Petals />
       <CursorGlow />
       <MusicPlayer />
       <Lightbox

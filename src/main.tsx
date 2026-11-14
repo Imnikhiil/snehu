@@ -9,6 +9,7 @@ import './styles/sections.css';
 import './styles/birthday.css';
 import './styles/polish.css';
 import './styles/vault.css';
+import './styles/premium.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
