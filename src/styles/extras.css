@@ -129,3 +129,42 @@
 .story__bottom { position: absolute; z-index: 5; left: 0; right: 0; bottom: 0; padding: 48px 20px max(18px, env(safe-area-inset-bottom)); background: linear-gradient(transparent, rgba(0, 0, 0, 0.65)); pointer-events: none; }
 .story__caption { font-family: var(--font-serif); font-style: italic; font-size: clamp(1.05rem, 2.4vw, 1.5rem); text-align: left; }
 @media (prefers-reduced-motion: reduce) { .story__play::before { animation: none; } }
+
+/* ── balloon game ── */
+.sec--bl { text-align: center; background: radial-gradient(ellipse at 50% 60%, rgba(244, 191, 210, 0.1), transparent 60%), var(--bg); }
+.bl__hint { margin-top: 1rem; color: var(--gold); font-family: var(--font-hand); font-size: clamp(1.4rem, 3vw, 1.9rem); }
+.bl__stage { position: relative; overflow: hidden; max-width: 1000px; height: clamp(420px, 72vh, 680px); margin: 0 auto; border-radius: 24px; user-select: none; -webkit-user-select: none;
+  background: linear-gradient(180deg, #0e1020, #171230 60%, #2a1c40); box-shadow: 0 40px 100px rgba(0, 0, 0, 0.55), 0 0 0 1px var(--line); }
+.bl__start { position: absolute; z-index: 1; inset: 0; display: grid; place-items: center; pointer-events: none; font-family: var(--font-hand); font-size: clamp(2rem, 6vw, 3.4rem); color: rgba(255, 255, 255, 0.35); animation: nudge 2.6s ease-in-out infinite; }
+
+.bl { position: absolute; z-index: 2; left: var(--x); bottom: -140px; width: var(--size); height: calc(var(--size) * 1.55); padding: 0; cursor: pointer; touch-action: manipulation;
+  animation: blRise var(--dur) linear forwards; }
+@keyframes blRise { from { transform: translateY(0); } to { transform: translateY(-95vh); } }
+.bl.is-popped { pointer-events: none; animation-play-state: paused; }
+.bl__sway { position: relative; display: block; width: 100%; height: 100%; animation: blSway 3.2s ease-in-out infinite alternate; }
+@keyframes blSway { from { transform: translateX(calc(var(--sway) * -1)); } to { transform: translateX(var(--sway)); } }
+.bl__body { position: absolute; left: 0; right: 0; top: 0; height: 82%; border-radius: 50% 50% 50% 50% / 58% 58% 42% 42%;
+  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.75), transparent 34%), linear-gradient(155deg, var(--c1), var(--c2));
+  box-shadow: inset -8px -10px 18px rgba(0, 0, 0, 0.18), 0 10px 24px rgba(0, 0, 0, 0.35); }
+.bl__body::after { content: ''; position: absolute; left: 50%; bottom: -7px; width: 12px; height: 10px; translate: -50% 0; background: var(--c2); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.bl__string { position: absolute; left: 50%; top: 82%; width: 1px; height: 18%; background: rgba(255, 255, 255, 0.35); }
+.bl.is-popped .bl__body, .bl.is-popped .bl__string { animation: blPop 0.22s ease-out forwards; }
+@keyframes blPop { to { transform: scale(1.45); opacity: 0; } }
+.bl__bit { position: absolute; left: 50%; top: 38%; width: 9px; height: 9px; border-radius: 50%; background: var(--c1); box-shadow: 0 0 10px var(--c1); animation: blBit 0.65s ease-out forwards; }
+@keyframes blBit { to { transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; } }
+
+.bl__panel { max-width: 36rem; min-height: 11rem; margin: 1.8rem auto 0; display: grid; justify-items: center; align-content: start; gap: 0.9rem; }
+.bl__wish { min-height: 4.2rem; font-family: var(--font-serif); font-style: italic; font-size: clamp(1.2rem, 2.6vw, 1.7rem); line-height: 1.45; color: #f1ecdf; animation: blWish 0.7s var(--ease); }
+.bl__wish--idle { color: var(--muted); animation: none; }
+@keyframes blWish { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+.bl__dots { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.bl__dots span { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.35); transition: background 0.3s, border-color 0.3s, transform 0.4s var(--ease); }
+.bl__dots span.is-on { background: var(--gold); border-color: var(--gold); transform: scale(1.2); }
+.bl__count { font-size: 0.85rem; letter-spacing: 0.12em; color: var(--muted); }
+.bl__done { font-family: var(--font-hand); font-size: clamp(1.6rem, 3.4vw, 2.2rem); color: var(--pink); }
+.bl__actions { margin-top: 1.2rem; display: flex; justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) {
+  .bl { animation: none !important; bottom: var(--y, 10%) !important; }
+  .bl__sway, .bl__start { animation: none !important; }
+}

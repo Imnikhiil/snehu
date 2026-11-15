@@ -15,6 +15,7 @@ import BirthdayLetter from './components/BirthdayLetter/BirthdayLetter';
 import OpenWhen from './components/OpenWhen/OpenWhen';
 import SecretVault from './components/SecretVault/SecretVault';
 import BirthdayCake from './components/BirthdayCake/BirthdayCake';
+import Balloons from './components/Balloons/Balloons';
 import WishJar from './components/WishJar/WishJar';
 import PhotoCollage from './components/PhotoCollage/PhotoCollage';
 import FinalCelebration from './components/FinalCelebration/FinalCelebration';
@@ -61,6 +62,7 @@ export default function App() {
         <OpenWhen />
         <SecretVault />
         <BirthdayCake />
+        <Balloons />
         <WishJar />
         <PhotoCollage />
         <FinalCelebration />
