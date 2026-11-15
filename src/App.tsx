@@ -17,6 +17,7 @@ import SecretVault from './components/SecretVault/SecretVault';
 import BirthdayCake from './components/BirthdayCake/BirthdayCake';
 import Balloons from './components/Balloons/Balloons';
 import WishJar from './components/WishJar/WishJar';
+import SurpriseGift from './components/SurpriseGift/SurpriseGift';
 import PhotoCollage from './components/PhotoCollage/PhotoCollage';
 import FinalCelebration from './components/FinalCelebration/FinalCelebration';
 import MusicPlayer from './components/MusicPlayer/MusicPlayer';
@@ -64,6 +65,7 @@ export default function App() {
         <BirthdayCake />
         <Balloons />
         <WishJar />
+        <SurpriseGift />
         <PhotoCollage />
         <FinalCelebration />
       </main>
