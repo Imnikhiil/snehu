@@ -3,7 +3,7 @@ import { Pause, Play, Volume2 } from 'lucide-react';
 import { music } from '../../data/music';
 import { cssVars } from '../../utils/cssVars';
 
-/** Floating player. Lives at the app root, so music keeps playing while the visitor scrolls. Never autoplays. */
+/** Floating player. Lives at the app root, so music keeps playing while the visitor scrolls. Starts automatically (see autoplay effect below). */
 export default function MusicPlayer() {
   const audio = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -12,6 +12,7 @@ export default function MusicPlayer() {
   const [dur, setDur] = useState(0);
   const [error, setError] = useState(false);
   const enabled = Boolean(music.src) && !error;
+  const userPaused = useRef(false); // true once the visitor pauses it themselves — we never force it back on
 
   useEffect(() => {
     if (audio.current) audio.current.volume = vol;
@@ -26,11 +27,43 @@ export default function MusicPlayer() {
     return () => document.removeEventListener('play', onPlay, true);
   }, []);
 
+  // Autoplay: try right away. Browsers usually block sound until the visitor touches the page,
+  // so if that happens we start on the very first tap / click / key press instead.
+  useEffect(() => {
+    if (!enabled) return;
+    const events = ['pointerup', 'touchend', 'click', 'keydown'] as const;
+    let done = false;
+
+    const cleanup = () => {
+      done = true;
+      events.forEach((ev) => window.removeEventListener(ev, tryPlay, true));
+    };
+    const tryPlay = (e?: Event) => {
+      const a = audio.current;
+      if (done || !a || userPaused.current) return;
+      // taps on the player's own buttons are handled by toggle()
+      if (e?.target instanceof Element && e.target.closest('.music')) return;
+      a.play().then(cleanup).catch((err) => {
+        // NotAllowedError = browser wants a gesture first → keep waiting. Anything else = real problem.
+        if (err?.name !== 'NotAllowedError') setError(true);
+      });
+    };
+
+    events.forEach((ev) => window.addEventListener(ev, tryPlay, true));
+    tryPlay();
+    return cleanup;
+  }, [enabled]);
+
   const toggle = () => {
     const a = audio.current;
     if (!a || !enabled) return;
-    if (a.paused) a.play().catch(() => setError(true));
-    else a.pause();
+    if (a.paused) {
+      userPaused.current = false;
+      a.play().catch(() => setError(true));
+    } else {
+      userPaused.current = true;
+      a.pause();
+    }
   };
 
   const label = enabled ? music.title : error ? 'Music file not found' : 'Music coming soon';
@@ -43,7 +76,7 @@ export default function MusicPlayer() {
           ref={audio}
           src={music.src}
           loop
-          preload="none"
+          preload="auto"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
           onTimeUpdate={() => setCur(audio.current?.currentTime ?? 0)}
