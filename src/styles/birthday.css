@@ -134,3 +134,9 @@
 .music__vol input { width: 70px; accent-color: var(--lavender); }
 @media (hover: hover) and (min-width: 768px) { .music__vol { display: flex; } }
 .music__bar { position: absolute; left: 0; bottom: 0; height: 2px; width: var(--p, 0%); background: var(--lavender); }
+/* Phones: keep the player a small circle so it never covers content; the title only shows while playing. */
+@media (max-width: 767px) {
+  .music { padding: 5px 12px 5px 5px; gap: 0.5rem; }
+  .music:not(.is-playing) .music__title { display: none; }
+  .music__title { max-width: 7rem; }
+}

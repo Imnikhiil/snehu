@@ -17,10 +17,20 @@ const DESKTOP: Reel[] = [
   { path: [[-0.04, 0.19], [0.12, 0.12], [0.24, 0.28], [0.34, 0.43]], from: 0, count: 10, speed: 0.024, h0: 0.075, h1: 0.135 },
   { path: [[1.06, 0.47], [0.96, 0.49], [0.88, 0.53], [0.76, 0.56]], from: 10, count: 5, speed: 0.03, h0: 0.1, h1: 0.075 },
 ];
-// Mobile: ONE slim strip gliding along the bottom edge of the photo stage (the collage sits above it).
+// Mobile: one curved strip flowing across the top of the stage; the photo collage sits right below it.
+// (h0/h1 are fractions of the *stage* height, which on phones is only the top part of the hero.)
 const MOBILE: Reel[] = [
-  { path: [[-0.08, 0.95], [0.28, 0.88], [0.7, 1.0], [1.08, 0.92]], from: 0, count: 9, speed: 0.028, h0: 0.1, h1: 0.115 },
+  { path: [[-0.1, 0.2], [0.25, 0.03], [0.7, 0.21], [1.1, 0.09]], from: 0, count: 9, speed: 0.028, h0: 0.17, h1: 0.24 },
 ];
+
+// Mobile collage: l = centre (% of stage width), t = top (% of stage height), h = card height (% of stage height).
+const MOBILE_CARDS = [
+  { l: 50, t: 28, h: 60, r: -2, z: 4 },
+  { l: 21, t: 39, h: 44, r: -7, z: 3 },
+  { l: 79, t: 36, h: 46, r: 6, z: 3 },
+  { l: 3, t: 64, h: 28, r: 5, z: 1 },
+  { l: 97, t: 66, h: 28, r: -5, z: 1 },
+] as const;
 
 // Big overlapping floating cards (desktop). l/t = % position, w = width in vw, r = tilt, d = parallax depth (px), z = layer.
 const CARDS = [
@@ -31,15 +41,6 @@ const CARDS = [
   { l: 63, t: 52, w: 14, r: -3, d: 30, z: 4, o: 'portrait', dim: 1 },
   { l: 80, t: 40, w: 8.5, r: 2, d: 14, z: 3, o: 'portrait', dim: 1 },
   { l: 21, t: 58, w: 12, r: 2, d: 6, z: 0, o: 'landscape', dim: 0.5 },
-] as const;
-
-// Mobile collage: l/t = % of the cluster box, w = width in vw (also capped by stage height), r = tilt, z = layer.
-const MOBILE_CARDS = [
-  { l: 25, t: 4, w: 37, r: -3, d: 0, z: 4, o: 'portrait', dim: 1 },
-  { l: 58, t: 0, w: 31, r: 5, d: 0, z: 3, o: 'portrait', dim: 1 },
-  { l: 3, t: 30, w: 25, r: -8, d: 0, z: 2, o: 'portrait', dim: 1 },
-  { l: 67, t: 36, w: 26, r: 6, d: 0, z: 3, o: 'portrait', dim: 1 },
-  { l: 33, t: 54, w: 36, r: -2, d: 0, z: 5, o: 'landscape', dim: 1 },
 ] as const;
 
 const ITEM_W = { portrait: 76, landscape: 134, square: 100 } as const;
@@ -144,17 +145,11 @@ function ReelLayer({ reel, photos, base, onOpen }: LayerProps) {
   );
 }
 
-interface CardSpec { l: number; t: number; w: number; r: number; d: number; z: number; o: 'portrait' | 'landscape'; dim: number }
-
-function Cluster({ photos, base, onOpen, cards, mobile }: { photos: Photo[]; base: number; onOpen: (i: number) => void; cards: readonly CardSpec[]; mobile?: boolean }) {
+function Cluster({ photos, base, onOpen }: { photos: Photo[]; base: number; onOpen: (i: number) => void }) {
   return (
-    <div className={`cluster ${mobile ? 'cluster--m' : ''}`}>
-      {cards.map((c, i) => {
+    <div className="cluster">
+      {CARDS.map((c, i) => {
         const photo = photos[i % photos.length];
-        // Desktop: scale with viewport. Mobile: scale with width but never outgrow the stage height.
-        const width = mobile
-          ? `min(${c.w}vw, calc(var(--stage-h) * ${(c.w * 0.0115).toFixed(4)}))`
-          : `min(${c.w}vw, ${(c.w * 1.7).toFixed(1)}vh)`;
         return (
           <div
             key={i}
@@ -162,7 +157,7 @@ function Cluster({ photos, base, onOpen, cards, mobile }: { photos: Photo[]; bas
             style={{
               left: `${c.l}%`,
               top: `${c.t}%`,
-              width,
+              width: `min(${c.w}vw, ${(c.w * 1.7).toFixed(1)}vh)`,
               aspectRatio: c.o === 'portrait' ? '4 / 5' : '3 / 2',
               zIndex: c.z,
               rotate: `${c.r}deg`,
@@ -171,6 +166,36 @@ function Cluster({ photos, base, onOpen, cards, mobile }: { photos: Photo[]; bas
             }}
           >
             <div className="card__float" style={{ animationDuration: `${7 + i * 1.3}s`, animationDelay: `${-i * 1.7}s` }}>
+              <button className="card__btn" onClick={() => onOpen(base + i)} aria-label={`Open photo ${base + i + 1}`}>
+                <img src={photo.src} alt={photo.caption || 'A photograph'} loading={i < 3 ? 'eager' : 'lazy'} decoding="async" draggable={false} />
+              </button>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Overlapping, gently floating photo cards for phones — the mobile twin of the desktop <Cluster>. */
+function MobileCluster({ photos, base, onOpen }: { photos: Photo[]; base: number; onOpen: (i: number) => void }) {
+  return (
+    <div className="cluster cluster--m">
+      {MOBILE_CARDS.map((c, i) => {
+        const photo = photos[i % photos.length];
+        return (
+          <div
+            key={i}
+            className="card mcard"
+            style={{
+              left: `${c.l}%`,
+              top: `${c.t}%`,
+              zIndex: c.z,
+              rotate: `${c.r}deg`,
+              ...cssVars({ '--h': c.h, '--d': 0, '--i': i }),
+            }}
+          >
+            <div className="card__float" style={{ animationDuration: `${6 + i * 1.1}s`, animationDelay: `${-i * 1.6}s` }}>
               <button className="card__btn" onClick={() => onOpen(base + i)} aria-label={`Open photo ${base + i + 1}`}>
                 <img src={photo.src} alt={photo.caption || 'A photograph'} loading={i < 3 ? 'eager' : 'lazy'} decoding="async" draggable={false} />
               </button>
@@ -201,13 +226,11 @@ export default function FloatingPhotoReel({ photos, onOpen }: Props) {
           onOpen={onOpen}
         />
       ))}
-      <Cluster
-        photos={photos.slice(15, 22)}
-        base={15}
-        onOpen={onOpen}
-        cards={mobile ? MOBILE_CARDS : CARDS}
-        mobile={mobile}
-      />
+      {mobile ? (
+        <MobileCluster photos={photos.slice(15, 20)} base={15} onOpen={onOpen} />
+      ) : (
+        <Cluster photos={photos.slice(15, 22)} base={15} onOpen={onOpen} />
+      )}
     </div>
   );
 }
