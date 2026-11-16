@@ -81,18 +81,55 @@
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
 }
 
-/* Mobile — a different composition, not a shrunken desktop */
+/* Mobile — a different composition, not a shrunken desktop:
+   photo collage on top → text below → signature badge last. Nothing overlaps the copy. */
 @media (max-width: 767px) {
-  .hero__scrim { background: linear-gradient(0deg, rgba(8, 9, 11, 0.95) 0%, rgba(8, 9, 11, 0.8) 38%, transparent 62%); }
-  .hero__content { left: 1.4rem; right: 1.4rem; bottom: 6.2rem; max-width: none; }
-  .hero__eyebrow { font-size: 0.64rem; letter-spacing: 0.18em; gap: 0.7rem; margin-bottom: 1rem; }
-  .hero__eyebrow i { width: 28px; }
-  .hero__title { font-size: clamp(2.3rem, 10.8vw, 3.4rem); }
-  .hero__sub { margin-top: 1.1rem; font-size: 0.95rem; }
-  .hero__cta { margin-top: 1.4rem; }
-  .btn { min-height: 48px; }
+  .hero {
+    --stage-h: clamp(320px, 46svh, 440px);
+    display: flex; flex-direction: column;
+    padding-top: var(--stage-h);
+    padding-bottom: calc(5.4rem + env(safe-area-inset-bottom));
+  }
+
+  /* photo stage = top block only */
+  .stage { inset: 0 0 auto 0; height: var(--stage-h); }
+  .stage::before { /* soft lavender glow behind the collage */
+    content: ''; position: absolute; inset: 8% -10% 0; z-index: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 55%, rgba(201, 184, 255, 0.22), transparent 62%);
+  }
+  .cluster--m { inset: 4.1rem 0 0 0; }
+  .card__btn { border-radius: 12px; box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55); border: 1px solid rgba(255, 255, 255, 0.12); }
+  .reel__item { border-radius: 7px; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5); }
+
+  /* scrim only fades the stage: dark at the top (navbar) and bottom (into the text) */
+  .hero__scrim {
+    inset: 0 0 auto 0; height: var(--stage-h);
+    background: linear-gradient(180deg, rgba(8, 9, 11, 0.7) 0%, transparent 22%),
+                linear-gradient(0deg, var(--bg) 0%, rgba(8, 9, 11, 0.55) 10%, transparent 24%);
+  }
+
+  /* copy flows normally under the stage */
+  .hero__content { position: relative; left: auto; right: auto; bottom: auto; max-width: none; margin-top: auto; padding: 1.1rem 1.4rem 0; }
+  .hero__eyebrow { font-size: 0.62rem; letter-spacing: 0.15em; gap: 0.7rem; margin-bottom: 0.9rem; }
+  .hero__eyebrow i { width: 24px; }
+  .hero__title { font-size: clamp(2.1rem, 9.6vw, 3.2rem); line-height: 1.06; }
+  .hero__sub { margin-top: 1rem; font-size: 0.92rem; line-height: 1.6; max-width: 30rem; }
+  .hero__cta { flex-direction: column; align-items: stretch; gap: 0.2rem; margin-top: 1.3rem; max-width: 22rem; }
+  .btn { min-height: 52px; }
+  .btn--ghost { min-height: 44px; padding: 0 0.6rem; color: var(--lavender); }
+
   .hero__scroll { display: none; }
-  .hero__badge { left: 50%; right: auto; translate: -50% 0; bottom: 1.6rem; white-space: nowrap; font-size: 0.64rem; }
-  .hero__wire { width: 150vmax; height: 150vmax; top: 30%; }
+  .hero__badge {
+    position: relative; right: auto; bottom: auto; align-self: flex-start;
+    margin: 1.4rem 0 0 1.4rem; padding: 0.5rem 0.95rem; white-space: nowrap; font-size: 0.62rem; letter-spacing: 0.16em;
+  }
+
+  .hero__wire { width: 150vmax; height: 150vmax; top: calc(var(--stage-h) * 0.6); }
   .hero__grid { background-size: 56px 56px; }
+}
+
+/* very small phones */
+@media (max-width: 359px) {
+  .hero__title { font-size: 2rem; }
+  .hero__eyebrow { letter-spacing: 0.1em; }
 }
